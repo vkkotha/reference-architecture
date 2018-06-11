@@ -1,0 +1,64 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		// classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+	}
+}
+
+plugins {
+  id "io.spring.dependency-management" version "1.0.5.RELEASE"
+}
+
+group = 'com.reference.app'
+version = '0.0.1-SNAPSHOT'
+
+
+repositories {
+    mavenCentral()
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.junit.platform.gradle.plugin'
+sourceCompatibility = 1.8
+
+configurations {
+	testCompile.exclude group:"junit", module:"junit"
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('com.h2database:h2')
+	compile files('libs/ojdbc6.jar')
+	compile("org.hibernate.validator:hibernate-validator")
+	compile('org.liquibase:liquibase-core')
+	compileOnly('org.projectlombok:lombok')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.junit.jupiter:junit-jupiter-api')
+	testCompile('org.junit.jupiter:junit-jupiter-engine')
+}
+
+dependencyManagement {
+    imports { 
+    	mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") 
+    }
+}
+
+/* START Dockert tasks */
+def DOCKER_ORACLE_IMAGE_NAME = "app-db"
+
+task buildDockerOracleImage(type:Exec) {
+    description = 'Build Oracle Docker Image'
+    group = "docker"
+    
+    commandLine "docker", "build", "--rm", "-t", "${DOCKER_ORACLE_IMAGE_NAME}", "-f", "docker/Dockerfile", "docker"
+}
+/* END Dockert tasks */

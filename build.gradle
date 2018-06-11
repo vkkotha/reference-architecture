@@ -1,0 +1,60 @@
+subprojects {
+	buildscript {
+		ext {
+			springBootVersion = '2.0.2.RELEASE'
+		}
+		repositories {
+			mavenCentral()
+		}
+	}
+
+    apply plugin: 'java'
+	apply plugin: 'eclipse'
+	sourceCompatibility = 1.8
+
+    group = 'com.reference.app'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+/* START Dockert tasks */
+def DOCKER_ORACLE_IMAGE_NAME = "app-db"
+
+task buildDockerOracleImage(type:Exec) {
+    description = 'Build Oracle Docker Image'
+    group = "docker"
+    
+    commandLine "docker", "build", "--rm", "-t", "${DOCKER_ORACLE_IMAGE_NAME}", "-f", "db-docker/Dockerfile", "db-docker"
+}
+
+task buildAndStartDev(dependsOn: 'app-api:build', type:Exec) {
+    description = 'Create and Start API Docker Development Environment'
+    group = "docker"
+    
+    commandLine "docker-compose", "up", "--build"
+}
+
+task startDev(type:Exec) {
+    description = 'Create and Start API Docker Development Environment'
+    group = "docker"
+    
+    commandLine "docker-compose", "up"
+}
+
+task stopDev(type:Exec) {
+    description = 'Stop Docker API Development Environment'
+    group = "docker"
+    
+    commandLine "docker-compose", "stop"
+}
+
+task resetDev(type:Exec) {
+    description = 'Clear Docker API Development Environment'
+    group = "docker"
+    
+    commandLine "docker-compose", "down"
+}
+/* END Dockert tasks */
